@@ -21,8 +21,56 @@ header{padding:14px;text-align:center;background:rgba(0,0,0,0.5);position:relati
 #homeCanvas {position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 canvas.star-bg {position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}
 /* Question stars */
-@keyframes twinkle {0%,100% {opacity:1; transform:scale(1);}50% {opacity:0.5; transform:scale(1.2);}}
-.star-question{position:absolute;width:100px;height:100px;background: radial-gradient(circle, #fff, #ddd 30%, transparent 70%);clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);box-shadow:0 0 20px #fff, 0 0 40px #fff;cursor:pointer;animation: twinkle 2s infinite;opacity:0;transition:opacity 0.3s;}
+@keyframes twinkle {0%,100% {opacity:1; transform:scale(1);}50% {opacity:0.5; transform:scale(1.15);}}
+
+/* Base star */
+.star-question{
+  position:absolute;
+  width:100px;height:100px;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  cursor:pointer;
+  animation: twinkle 2s infinite;
+  transition: all 0.25s ease;
+  opacity: 0;
+  z-index:4;
+  display:flex;align-items:center;justify-content:center;
+  /* default fallback background (will be overridden by state classes) */
+  background: radial-gradient(circle,#ddd,#bbb 30%,transparent 70%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.12);
+}
+
+/* states */
+/* pending = created but not answered */
+.star-question.pending{
+  background: radial-gradient(circle,#effc02,#f9dc01 30%,transparent 70%);
+  box-shadow:0 0 12px rgba(249, 199, 2, 0.811);
+  filter:grayscale(60%) brightness(0.7);
+  opacity:1;
+}
+
+/* active = the user opened this question now */
+.star-question.active{
+  transform: scale(1.06);
+  filter:grayscale(0) brightness(1.15);
+  box-shadow:0 0 30px rgba(255, 238, 1, 0.6);
+}
+
+/* correct = answered correctly */
+.star-question.correct{
+  background: radial-gradient(circle,#b8f886,#66e07a 30%,transparent 70%);
+  box-shadow:0 0 30px rgba(102,224,122,0.9), 0 0 60px rgba(102,224,122,0.5);
+  filter:none;
+  opacity:1;
+}
+
+/* wrong = answered incorrectly */
+.star-question.wrong{
+  background: radial-gradient(circle,#ff9b9b,#ff5252 30%,transparent 70%);
+  box-shadow:0 0 30px rgba(255,82,82,0.9), 0 0 60px rgba(255,82,82,0.4);
+  filter:none;
+  opacity:1;
+}
+
 /* Popup */
 .popup{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#111;padding:24px;border-radius:12px;display:none;color:#fff;z-index:20;max-width:500px;min-width:300px;}
 .popup h2{margin-bottom:15px;}
@@ -47,52 +95,18 @@ canvas.star-bg {position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}
   box-shadow: 0 0 40px rgba(255,255,255,0.9);
   animation: popupZoom 0.6s ease;
 }
-#congratsPopup h2 {
-  font-size: 42px;
-  margin-bottom: 20px;
-}
-#congratsPopup p {
-  font-size: 26px;
-  margin: 15px 0;
-}
-@keyframes popupZoom {
-  from { transform: translate(-50%,-50%) scale(0.5); opacity: 0; }
-  to   { transform: translate(-50%,-50%) scale(1); opacity: 1; }
-}
+#congratsPopup h2 {font-size:42px;margin-bottom:20px;}
+#congratsPopup p {font-size:26px;margin:15px 0;}
+@keyframes popupZoom {from { transform: translate(-50%,-50%) scale(0.5); opacity: 0; } to   { transform: translate(-50%,-50%) scale(1); opacity: 1; }}
 
 /* Confetti */
-.confetti {
-  position: fixed;
-  width: 12px;
-  height: 12px;
-  background-color: hsl(var(--hue), 90%, 60%);
-  top: -10px;
-  border-radius: 50%;
-  animation: fall 3s linear forwards;
-  z-index: 99999;
-}
-@keyframes fall {
-  to { transform: translateY(100vh) rotate(720deg); }
-}
+.confetti {position: fixed;width: 12px;height: 12px;background-color: hsl(var(--hue), 90%, 60%);top: -10px;border-radius: 50%;animation: fall 3s linear forwards;z-index: 99999;}
+@keyframes fall { to { transform: translateY(100vh) rotate(720deg); }}
 
 /* Level Score Popup (small, shown after finishing level) */
-#levelScorePopup {
-  background: #111;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  font-size: 20px;
-  box-shadow: 0 0 25px rgba(255,255,255,0.6);
-  max-width: 400px;
-}
-#levelScorePopup h2 {
-  margin-bottom: 10px;
-  font-size: 24px;
-}
-#levelScorePopup p {
-  margin: 10px 0;
-  font-size: 18px;
-}
+#levelScorePopup {background: #111;padding:20px;border-radius:12px;text-align:center;font-size:20px;box-shadow:0 0 25px rgba(255,255,255,0.6);max-width:400px;}
+#levelScorePopup h2{margin-bottom:10px;font-size:24px;}
+#levelScorePopup p{margin:10px 0;font-size:18px;}
 </style>
 </head>
 <body>
@@ -170,7 +184,7 @@ planets.forEach((p,i)=>{
 
 /* Confetti (more pieces for final celebration) */
 function launchConfetti(){
-  for(let i=0;i<120;i++){ // more confetti pieces
+  for(let i=0;i<120;i++){
     const confetti=document.createElement("div");
     confetti.className="confetti";
     confetti.style.left=Math.random()*100+"vw";
@@ -184,7 +198,7 @@ function launchConfetti(){
   }
 }
 
-/* الـ 53 سؤال (Easy 18, Medium 18, Hard 17) -- نص الأسئلة اللي اديتني ياها */
+/* الـ 53 سؤال (Easy 18, Medium 18, Hard 17) */
 const allQuestions=[
   /* Easy (18) */
   {q:"What if I don't have a team yet?", options:["You must find a team before registration closes","You can join existing teams through the platform or find teammates at the bootcamp","You'll be automatically assigned to a random team","You cannot participate without a pre-formed team"], a:"You can join existing teams through the platform or find teammates at the bootcamp", note:"We'll provide team formation activities during the bootcamp to help you connect with other participants who share your interests and skills."},
@@ -244,7 +258,7 @@ const allQuestions=[
   {q:"Which subjects are covered in the 2025 challenges?", options:["Only technical and programming subjects","Animation, Data Science, Earth Science, AI, Business, and more","Only space-related subjects","Only environmental and climate subjects"], a:"Animation, Data Science, Earth Science, AI, Business, and more", note:"The 2025 challenges span diverse subjects including Animation, Arts, AI, Data Science, Earth Science, Business Economics, and many others."},
   {q:"What new technology focus appears prominently in multiple 2025 challenges?", options:["Blockchain technology","Artificial Intelligence and Machine Learning","Quantum computing","Augmented Reality only"], a:"Artificial Intelligence and Machine Learning", note:"AI/ML features in several challenges including exoplanet detection, space biology knowledge engines, and air quality forecasting."},
   {q:"Which challenge specifically addresses climate and environmental storytelling?", options:["Environmental Data Analysis","Tell us a climate story (similar to TerraTales' winning challenge)","Climate Change Solutions","Environmental Monitoring Systems"], a:"Tell us a climate story (similar to TerraTales' winning challenge)", note:"This type of storytelling challenge, similar to what TerraTales won with, emphasizes creative communication of climate data and impacts."}
-]; /* end allQuestions (53 total) */
+]; /* end allQuestions */
 
 /* توزيع الأسئلة على 5 ليفلات (11,11,17,7,7) */
 const levels=[
@@ -307,9 +321,10 @@ function createStarForQuestion(i){
   const angle=i/activeLevel.questions.length*2*Math.PI;
   const x=cx+Math.cos(angle)*r-50,y=cy+Math.sin(angle)*r-50;
   const star=document.createElement("div");
-  star.className="star-question";
+  star.className="star-question pending";
   star.style.left=x+"px"; star.style.top=y+"px";
   star.style.opacity=1;
+  star.dataset.q = i; // index for later reference
   star.onclick=()=>openQ(i);
   starsDiv.appendChild(star);
 }
@@ -319,6 +334,12 @@ function openQ(i){
   activeQ=i;
   qText.innerText=activeLevel.questions[i].q;
   optionsDiv.innerHTML="";
+  // mark star active
+  const starEl = starsDiv.querySelector(`[data-q="${i}"]`);
+  if(starEl){
+    starEl.classList.remove('pending','correct','wrong');
+    starEl.classList.add('active');
+  }
   activeLevel.questions[i].options.forEach(opt=>{
     let btn=document.createElement("button");
     btn.className="option-btn";
@@ -335,15 +356,31 @@ function submitAnswer(selected){
   const correct=activeLevel.questions[activeQ].a;
   const note=activeLevel.questions[activeQ].note;
   qPopup.style.display="none";
+
+  // find the star element for this question and mark it
+  const starEl = starsDiv.querySelector(`[data-q="${activeQ}"]`);
   if(selected===correct){
     totalScore++;
     levelScore++;
     infoTitle.innerText="✅ Correct";
     infoBody.innerText="Well done!\n"+note;
+    if(starEl){
+      starEl.classList.remove('pending','active');
+      starEl.classList.add('correct');
+      starEl.onclick = null; // disable further clicks
+      starEl.style.pointerEvents = "none";
+    }
   } else {
     infoTitle.innerText="❌ Wrong";
     infoBody.innerText="Correct answer: "+correct+"\n"+note;
+    if(starEl){
+      starEl.classList.remove('pending','active');
+      starEl.classList.add('wrong');
+      starEl.onclick = null;
+      starEl.style.pointerEvents = "none";
+    }
   }
+
   infoPopup.style.display="block";
 }
 
@@ -375,7 +412,7 @@ function closeLevelScore(){
 
 /* Congrats final */
 function showCongrats(){
-  document.getElementById("finalScore").innerText = "Your total score: " + totalScore + " / 53";
+  document.getElementById("finalScore").innerText = "Your total score: " + totalScore + " / " + allQuestions.length;
   document.getElementById("congratsPopup").style.display="block";
   launchConfetti();
 }
